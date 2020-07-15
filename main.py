@@ -2,6 +2,7 @@ import pygame
 import os
 import time
 import random
+pygame.font.init()
 
 WIDTH, HEIGHT = 750, 750
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -28,6 +29,9 @@ BACKGROUND = pygame.transform.scale(pygame.image.load(os.path.join("assets", "ba
 def main():
     run = True
     FPS = 60
+    level = 1
+    lives = 5
+    main_font = pygame.font.SysFont("comicsans", 50)
     clock = pygame.time.Clock()
 
     # Easily draws and renders the screen
@@ -35,6 +39,13 @@ def main():
 
         # takes an image, converts to a "surface", and draws it
         WINDOW.blit(BACKGROUND, (0, 0))
+
+        # draw text
+        lives_label = main_font.render(f"Lives: {lives}", 1, (255, 255, 255))
+        level_label = main_font.render(f"Level: {level}", 1, (255, 255, 255))
+
+        WINDOW.blit(lives_label, (10, 10))
+        WINDOW.blit(level_label, (WIDTH - level_label.get_width() - 10, 10))
 
         # Refreshes the display
         pygame.display.update()
