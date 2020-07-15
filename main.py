@@ -26,6 +26,10 @@ YELLOW_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_yellow.png"
 BACKGROUND = pygame.transform.scale(pygame.image.load(os.path.join("assets", "background-black.png")), (WIDTH, HEIGHT))
 
 
+class Laser:
+    def __init__(self, )
+
+
 class Ship:
     def __init__(self, x, y, health=100):
         self.x = x
@@ -79,6 +83,7 @@ def main():
     level = 0
     lives = 5
     main_font = pygame.font.SysFont("comicsans", 50)
+    lost_font = pygame.font.SysFont("comicsans", 60)
 
     enemies = []
     wave_length = 5
@@ -90,13 +95,17 @@ def main():
 
     clock = pygame.time.Clock()
 
+    lost = False
+
+    lost_count = 0
+
     # Easily draws and renders the screen
     def redraw_window():
 
         # takes an image, converts to a "surface", and draws it
         WINDOW.blit(BACKGROUND, (0, 0))
 
-        # draw text
+        # Draw text
         lives_label = main_font.render(f"Lives: {lives}", 1, (255, 255, 255))
         level_label = main_font.render(f"Level: {level}", 1, (255, 255, 255))
 
@@ -108,12 +117,29 @@ def main():
 
         player.draw(WINDOW)
 
+        if lost:
+            lost_label = lost_font.render("You Lost", 1, (255, 255, 255))
+            WINDOW.blit(lost_label, (WIDTH/2 - lost_label.get_width()/2, 350))
+
         # Refreshes the display
         pygame.display.update()
 
     while run:
         clock.tick(FPS)
+        redraw_window()
 
+        # Loss detector
+        if lives <= 0 or player.health <= 0:
+            lost = True
+            lost_count += 1
+
+        if lost:
+            if lost_count > FPS * 3:
+                run = False
+            else:
+                continue
+
+        # Spawn Enemy
         if len(enemies) == 0:
             level += 1
             wave_length += 5
@@ -127,7 +153,7 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
 
-        # player movement
+        # Player movement
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a] and player.x - player_vel > 0:  # move left
             player.x -= player_vel
@@ -138,13 +164,12 @@ def main():
         if keys[pygame.K_s] and player.y + player.get_height() < HEIGHT:  # move down
             player.y += player_vel
 
+        # Enemy movement and remover
         for enemy in enemies:
             enemy.move(enemy_vel)
             if enemy.y + enemy.get_height() > HEIGHT:
                 lives -= 1
                 enemies.remove(enemy)
-
-        redraw_window()
 
 
 main()
