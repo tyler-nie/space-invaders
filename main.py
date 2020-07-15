@@ -37,7 +37,24 @@ class Ship:
         self.cooldown_counter = 0
 
     def draw(self, window):
-        pygame.draw.rect(window, (255, 0, 0), (self.x, self.y, 50, 50))
+        window.blit(self.ship_img, (self.x, self.y))
+
+    def get_width(self):
+        return self.ship_img.get_width()
+
+    def get_height(self):
+        return self.ship_img.get_height()
+
+
+class Player(Ship):
+    def __init__(self, x, y, health=100):
+        super().__init__(x, y, health)
+        self.ship_img = YELLOW_SPACE_SHIP
+        self.laser_img = YELLOW_LASER
+
+        # Where pixels are
+        self.mask = pygame.mask.from_surface(self.ship_img)
+        self.max_health = health
 
 
 def main():
@@ -47,7 +64,9 @@ def main():
     lives = 5
     main_font = pygame.font.SysFont("comicsans", 50)
 
-    ship = Ship(300, 650)
+    player_vel = 5
+
+    player = Player(300, 650)
 
     clock = pygame.time.Clock()
 
@@ -64,7 +83,7 @@ def main():
         WINDOW.blit(lives_label, (10, 10))
         WINDOW.blit(level_label, (WIDTH - level_label.get_width() - 10, 10))
 
-        ship.draw(WINDOW)
+        player.draw(WINDOW)
 
         # Refreshes the display
         pygame.display.update()
@@ -77,6 +96,17 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+
+        # player movement
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_a] and player.x - player_vel > 0:  # move left
+            player.x -= player_vel
+        if keys[pygame.K_d] and player.x + player.get_width() < WIDTH:  # move right
+            player.x += player_vel
+        if keys[pygame.K_w] and player.y - player_vel > 0:  # move up
+            player.y -= player_vel
+        if keys[pygame.K_s] and player.y + player.get_height() < HEIGHT:  # move down
+            player.y += player_vel
 
 
 main()
