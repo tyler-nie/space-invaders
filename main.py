@@ -115,17 +115,16 @@ class Player(Ship):
                 for obj in objs:
                     if laser.collision(obj):
                         objs.remove(obj)
-                        self.lasers.remove(laser)
+                        if laser in self.lasers:
+                            self.lasers.remove(laser)
 
     def draw(self, window):
         super().draw(window)
         self.healthbar(window)
 
     def healthbar(self, window):
-        pygame.draw.rect(window, (255, 0, 0), (self.x, self.y +
-                                               self.ship_img.get_height() + 10, self.ship_img.get_width(), 10))
-        pygame.draw.rect(window, (0, 255, 0), (self.x, self.y + self.ship_img.get_height() +
-                                               10, self.ship_img.get_width() * (self.health/self.max_health), 10))
+        pygame.draw.rect(window, (255, 0, 0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width(), 10))
+        pygame.draw.rect(window, (0, 255, 0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width() * (self.health/self.max_health), 10))
 
 
 class Enemy(Ship):
@@ -149,10 +148,9 @@ class Enemy(Ship):
             self.lasers.append(laser)
             self.cooldown_counter = 1
 
-# Collision detection
-
 
 def collide(obj1, obj2):
+    # Collision detection
     offset_x = obj2.x - obj1.x
     offset_y = obj2.y - obj1.y
     return obj1.mask.overlap(obj2.mask, (offset_x, offset_y)) != None
@@ -184,7 +182,7 @@ def main():
     # Easily draws and renders the screen
     def redraw_window():
 
-        # takes an image, converts to a "surface", and draws it
+        # Takes an image, converts to a "surface", and draws it
         WINDOW.blit(BACKGROUND, (0, 0))
 
         # Draw text
@@ -226,8 +224,7 @@ def main():
             level += 1
             wave_length += 5
             for i in range(wave_length):
-                enemy = Enemy(random.randrange(50, WIDTH - 100), random.randrange(-1500, -100),
-                              random.choice(["red", "blue", "green"]))
+                enemy = Enemy(random.randrange(50, WIDTH - 100), random.randrange(-1500, -100), random.choice(["red", "blue", "green"]))
                 enemies.append(enemy)
 
         # Detects if player quits
@@ -266,5 +263,24 @@ def main():
 
         player.move_lasers(-laser_vel, enemies)
 
+# Main Menu
 
-main()
+
+def main_menu():
+    title_font = pygame.font.SysFont("comicsans", 70)
+    run = True
+    while run:
+        WINDOW.blit(BACKGROUND, (0, 0))
+        title_label = title_font.render("Press the mouse to begin...", 1, (255, 255, 255))
+        WINDOW.blit(title_label, (WIDTH/2 - title_label.get_width()/2, 350))
+
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                main()
+    pygame.quit()
+
+
+main_menu()
